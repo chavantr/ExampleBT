@@ -10,10 +10,12 @@ class LoginTask : AsyncTask<JSONObject, Void, LoginResult>() {
 
     lateinit var loginLoginListener: OnLoginListener
 
+    private var name = "Login"
+
 
     override fun doInBackground(vararg param: JSONObject?): LoginResult {
         var loginResult = LoginResult()
-        var response = connectionUtil.requestPost(Constants.URL, param[0])
+        var response = connectionUtil.requestPost(Constants.URL + name, param[0])
         var jsonResponse = JSONObject(response)
         return loginResult
     }
