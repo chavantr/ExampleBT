@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 
 import org.json.JSONObject
@@ -21,7 +22,8 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
         }
 
         btnSignIn.setOnClickListener {
-
+            txtUserName.setText("test@test.com")
+            txtPassword.setText("test")
             login()
         }
 
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
 
     private fun login() {
         if (validate()) {
+            progressBar.visibility = View.VISIBLE
             var jFirst = JSONObject()
             var jLogin = JSONObject()
             jLogin.put("email", txtUserName.text)
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
     }
 
     override fun onLoginSuccess(loginResult: LoginResult) {
+        progressBar.visibility = View.GONE
         if (null != loginResult) {
             val intent = Intent(this, TrackerDashboardWithMenu::class.java)
             startActivity(intent)

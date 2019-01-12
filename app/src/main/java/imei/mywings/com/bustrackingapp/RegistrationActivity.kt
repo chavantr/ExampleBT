@@ -4,11 +4,11 @@ package imei.mywings.com.bustrackingapp
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import kotlinx.android.synthetic.main.activity_registration.*
 import org.json.JSONObject
 
 class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +42,11 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
     }
 
     override fun onRegistrationSuccess(result: Int) {
+        progressBar.visibility = View.GONE
         if (result > 0) {
             var snack = Snackbar.make(btnSignUp, "Registration complete", Snackbar.LENGTH_INDEFINITE).setAction("Ok") {
                 finish()
             }
-
             snack.show()
         } else {
             var snack = Snackbar.make(btnSignUp, "Error occurred", Snackbar.LENGTH_INDEFINITE).setAction("Ok") {

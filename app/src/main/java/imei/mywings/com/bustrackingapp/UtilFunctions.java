@@ -18,10 +18,7 @@ import java.util.regex.Pattern;
 
 public class UtilFunctions {
 
-    // private static final String pattern =
-    // "\\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4})\\s*";
-    // private static final String pattern =
-    // "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+
 
     private static final AlphaAnimation enableAnim = new AlphaAnimation(0.6f,
             1.0f);
@@ -80,7 +77,7 @@ public class UtilFunctions {
 
     public static boolean isValidEmail(String s) {
 
-        // return Pattern.matches(pattern, s);
+
         try {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(s).matches();
         } catch (NullPointerException exception) {
