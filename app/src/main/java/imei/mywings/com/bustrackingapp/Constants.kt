@@ -2,7 +2,12 @@ package imei.mywings.com.bustrackingapp
 
 object Constants {
 
-    val URL = "http://192.168.43.157:8057/MyRestService.svc/"
+    val URL = "http://192.168.2.7:8057/MyRestService.svc/"
+
+    val UPDATE_LOCATION="UpdateLocation"
+
+    val GET_CURRENT_LOCATION_BY_ID="GetCurrentLocationById"
+
 
     var STATUS = "Status"
     var AVAILABLEPARKING = "available_parking"

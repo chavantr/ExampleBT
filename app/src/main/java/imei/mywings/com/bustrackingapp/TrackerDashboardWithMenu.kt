@@ -67,7 +67,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     private var latLng: LatLng = LatLng(18.515665, 73.924090)
     private var locationManager: LocationManager? = null
     private lateinit var cPosition: Marker
-    private lateinit var cNewPosition: Marker
+    private var cNewPosition: Marker? = null
 
     private var newValue: Int = 0
 
@@ -286,7 +286,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                             BitmapDescriptorFactory
                                 .fromResource(R.mipmap.ic_launcher)
                         ).title("Bus : ${node.name} ")
-                        .snippet("${node.name} # ${node.drivename} # ${node.driverphone} # ${node.rid}")
+                        .snippet("${node.name} # ${node.drivename} # ${node.driverphone} # ${node.rid} #${node.id}")
                 )
             }
         }
@@ -301,17 +301,24 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     private val infoWindowAdapter = object : GoogleMap.InfoWindowAdapter {
 
         override fun getInfoContents(marker: Marker?): View? {
-            var view: View? = null
-            var values: List<String>
-            try {
-                view = layoutInflater.inflate(R.layout.layout_info, null)
-                values = marker!!.snippet.toString().split("#")
-                view!!.lblInfo.text =
-                    "Bus Name : ${values[0]}\nDriver Name : ${values[1]}\nDriver Phone : ${values[2]}"
-            } catch (e: Exception) {
-                view!!.lblInfo.text = "Your Location"
+
+            if (marker!!.tag == null) {
+
+                var view: View? = null
+                var values: List<String>
+                try {
+                    view = layoutInflater.inflate(R.layout.layout_info, null)
+                    values = marker!!.snippet.toString().split("#")
+                    view!!.lblInfo.text =
+                        "Bus Name : ${values[0]}\nDriver Name : ${values[1]}\nDriver Phone : ${values[2]}"
+                } catch (e: Exception) {
+                    view!!.lblInfo.text = "Your Location"
+                }
+
+
+                return view;
             }
-            return view;
+            return null
         }
 
         override fun getInfoWindow(marker: Marker?): View? {
@@ -323,7 +330,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     private val infoClick = GoogleMap.OnInfoWindowClickListener {
         try {
             val value = it.snippet.toString().split("#")[3]
-            newValue = value.toInt();
+            newValue = it.snippet.toString().split("#")[4].toString().trim().toInt()
             getRoute(value.trim().toInt())
             progressDialog.show()
         } catch (e: Exception) {
@@ -522,7 +529,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                     fixZoom(lineOptions.points)
                 }
 
-                initGetUpdateLocation()
+                fetch();
 
             } else {
                 Toast.makeText(
@@ -540,12 +547,13 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
      * @param lng
      */
     private fun setStartPosition(lat: Double, lng: Double) {
-        mMap!!.addMarker(
+        var startmark = mMap!!.addMarker(
             MarkerOptions()
                 .position(LatLng(lat, lng))
                 .title(nsource)
                 .snippet("")
         )
+        startmark.tag = 1
     }
 
     /**
@@ -553,12 +561,14 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
      * @param lng
      */
     private fun setDestPosition(lat: Double, lng: Double) {
-        mMap!!.addMarker(
+        var destmark = mMap!!.addMarker(
             MarkerOptions()
                 .position(LatLng(lat, lng))
                 .title(ndest)
                 .snippet("")
         )
+
+        destmark.tag = 1
     }
 
 
@@ -579,10 +589,26 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     override fun onUpdateLocationSuccess(find: Bus) {
         if (null != find) {
             if (null != cNewPosition) {
-                cNewPosition.remove()
+                cNewPosition!!.remove()
             }
             val latLnt = LatLng(find.clat.toDouble(), find.clng.toDouble())
-            cNewPosition = mMap!!.addMarker(MarkerOptions().position(latLnt).title("Bus Location\n${find.name}"))
+            cNewPosition = mMap!!.addMarker(
+                MarkerOptions().position(latLnt).title("${find.name}").icon(
+                    BitmapDescriptorFactory
+                        .fromResource(R.mipmap.ic_launcher)
+                )
+            )
+            cNewPosition!!.tag = 1
+        }
+    }
+
+    private fun fetch() {
+        Timer().schedule(timerTask, 5000, 10000)
+    }
+
+    private val timerTask = object : TimerTask() {
+        override fun run() {
+            initGetUpdateLocation()
         }
     }
 }

@@ -8,12 +8,15 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
+            android:name=".TrackGloabal"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme" android:name=".TrackGloabal">
+            android:theme="@style/AppTheme">
+        <activity android:name=".SelectBusActivity" android:label="@string/select_bus">
+        </activity>
         <activity
                 android:name=".MainActivity"
                 android:screenOrientation="portrait">
@@ -40,19 +43,21 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyClCN7T0VPX7MIoOJEMA3W9JLXhV_S7yx4"/>
 
-        <activity android:name=".SettingActivity" android:label="@string/action_settings">
+        <activity
+                android:name=".SettingActivity"
+                android:label="@string/action_settings">
         </activity>
         <activity
                 android:name=".TrackerDashboardWithMenu"
                 android:label="@string/title_activity_tracker_dashboard_with_menu"
-                android:theme="@style/AppTheme.NoActionBar" android:screenOrientation="portrait">
+                android:screenOrientation="portrait"
+                android:theme="@style/AppTheme.NoActionBar">
         </activity>
-
-        <activity android:name=".ProfileActivity" android:screenOrientation="portrait"
-                  android:label="@string/myprofile">
-
+        <activity
+                android:name=".ProfileActivity"
+                android:label="@string/myprofile"
+                android:screenOrientation="portrait">
         </activity>
-
     </application>
 
 </manifest>

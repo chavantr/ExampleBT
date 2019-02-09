@@ -15,7 +15,7 @@ class GetUpdateLocationAsync : AsyncTask<Int, Void, Bus>() {
 
     override fun doInBackground(vararg param: Int?): Bus? {
 
-        val response = httpConnectionUtil.requestGet(Constants.URL + "?=id${param[0]}")
+        val response = httpConnectionUtil.requestGet(Constants.URL + Constants.GET_CURRENT_LOCATION_BY_ID + "?id=${param[0]}")
 
         val jLocation = JSONObject(response)
 
