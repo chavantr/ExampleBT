@@ -38,23 +38,26 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import imei.mywings.com.bustrackingapp.routes.DirectionsJSONParser
-
+import imei.mywings.com.bustrackingapp.routes.JsonUtil
+import imei.mywings.com.bustrackingapp.update.GetUpdateLocationAsync
+import imei.mywings.com.bustrackingapp.update.OnLocationUpdateListener
 import kotlinx.android.synthetic.main.activity_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.app_bar_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.content_tracker_dashboard.*
 import kotlinx.android.synthetic.main.layout_info.view.*
+import org.json.JSONArray
 import org.json.JSONObject
-import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.HashMap
+import java.util.*
 
 class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+
     OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener, LocationListener, OnBusListener, OnRouteListener {
+    GoogleApiClient.OnConnectionFailedListener, LocationListener, OnBusListener, OnRouteListener,
+    OnLocationUpdateListener {
 
 
     private var mMap: GoogleMap? = null
@@ -64,8 +67,17 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     private var latLng: LatLng = LatLng(18.515665, 73.924090)
     private var locationManager: LocationManager? = null
     private lateinit var cPosition: Marker
+    private lateinit var cNewPosition: Marker
+
+    private var newValue: Int = 0
 
     private lateinit var progressDialog: ProgressDialog
+
+    private lateinit var jsonUtil: JsonUtil
+
+    private lateinit var nsource: String
+
+    private lateinit var ndest: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +90,10 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         progressDialog.setCancelable(false)
         progressDialog.setCanceledOnTouchOutside(false)
 
+        jsonUtil = JsonUtil()
+
         var frame = activity_place_map as SupportMapFragment
+
         frame.getMapAsync(this)
 
 
@@ -292,7 +307,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                 view = layoutInflater.inflate(R.layout.layout_info, null)
                 values = marker!!.snippet.toString().split("#")
                 view!!.lblInfo.text =
-                        "Bus Name : ${values[0]}\nDriver Name : ${values[1]}\nDriver Phone : ${values[2]}"
+                    "Bus Name : ${values[0]}\nDriver Name : ${values[1]}\nDriver Phone : ${values[2]}"
             } catch (e: Exception) {
                 view!!.lblInfo.text = "Your Location"
             }
@@ -308,6 +323,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     private val infoClick = GoogleMap.OnInfoWindowClickListener {
         try {
             val value = it.snippet.toString().split("#")[3]
+            newValue = value.toInt();
             getRoute(value.trim().toInt())
             progressDialog.show()
         } catch (e: Exception) {
@@ -315,12 +331,13 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
     }
     //internal var key = "&key=AIzaSyA1fYR6-7DIhgORWbFju3nGi3BDojCILp8"
     internal var key = "&key=AIzaSyClCN7T0VPX7MIoOJEMA3W9JLXhV_S7yx4"
+
     private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
         val strOrigin = ("origin=" + origin.latitude + ","
                 + origin.longitude)
         val strDest = "destination=" + dest.latitude + "," + dest.longitude
         val sensor = "sensor=false"
-       // val key = "&key=" + mKey
+        // val key = "&key=" + mKey
         val parameters = "$strOrigin&$strDest&$sensor$key"
         val output = "json"
         return ("https://maps.googleapis.com/maps/api/directions/"
@@ -356,6 +373,11 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
             srctlat = result[0].srclat.trim().toDouble()
 
             srclng = result[0].srclng.trim().toDouble()
+
+
+            nsource = result[0].source
+
+            ndest = result[0].destination
 
 
             val source = LatLng(srctlat, srclng)
@@ -418,13 +440,13 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
             // Reading data from url
             iStream = urlConnection.inputStream
 
-            val br = BufferedReader(
-                InputStreamReader(
-                    iStream!!
-                )
-            )
-            data = br.readLines().toString()
-            br.close()
+            /* val br = BufferedReader(
+                 InputStreamReader(
+                     iStream!!
+                 )
+             )*/
+            data = jsonUtil.convertStreamToString(iStream)
+            // br.close()
         } catch (e: Exception) {
 
         } finally {
@@ -444,6 +466,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         ): List<List<HashMap<String, String>>>? {
 
             val jObject: JSONObject
+            var jArray: JSONArray
             var routes: List<List<HashMap<String, String>>>? = null
 
             try {
@@ -498,6 +521,9 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                 if (map != null) {
                     fixZoom(lineOptions.points)
                 }
+
+                initGetUpdateLocation()
+
             } else {
                 Toast.makeText(
                     this@TrackerDashboardWithMenu,
@@ -517,7 +543,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         mMap!!.addMarker(
             MarkerOptions()
                 .position(LatLng(lat, lng))
-                .title("")
+                .title(nsource)
                 .snippet("")
         )
     }
@@ -530,7 +556,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         mMap!!.addMarker(
             MarkerOptions()
                 .position(LatLng(lat, lng))
-                .title("")
+                .title(ndest)
                 .snippet("")
         )
     }
@@ -541,8 +567,22 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         for (item in points) {
             bc.include(item)
         }
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 50))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 30))
     }
 
 
+    private fun initGetUpdateLocation() {
+        val getUpdateLocationAsync = GetUpdateLocationAsync()
+        getUpdateLocationAsync.setOnLocationUpdateListener(this, newValue)
+    }
+
+    override fun onUpdateLocationSuccess(find: Bus) {
+        if (null != find) {
+            if (null != cNewPosition) {
+                cNewPosition.remove()
+            }
+            val latLnt = LatLng(find.clat.toDouble(), find.clng.toDouble())
+            cNewPosition = mMap!!.addMarker(MarkerOptions().position(latLnt).title("Bus Location\n${find.name}"))
+        }
+    }
 }
