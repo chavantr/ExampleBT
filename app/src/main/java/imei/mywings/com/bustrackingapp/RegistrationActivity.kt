@@ -5,14 +5,20 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import imei.mywings.com.bustrackingapp.update.EvaluateAsync
+import imei.mywings.com.bustrackingapp.update.OnListenListener
 import kotlinx.android.synthetic.main.activity_registration.*
 import org.json.JSONObject
 
-class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
+class RegistrationActivity : AppCompatActivity(), OnRegistrationListener, OnListenListener {
+
+    private var flag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
+
+        initEvaluation()
 
         btnSignUp.setOnClickListener {
             if (validate()) {
@@ -30,6 +36,11 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
         }
     }
 
+    private fun initEvaluation() {
+        val evaluateAsync = EvaluateAsync()
+        evaluateAsync.setOnListenListener(this)
+    }
+
     private fun validate(): Boolean {
         return when {
             txtEmail.text!!.isEmpty() -> false
@@ -43,7 +54,7 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
 
     override fun onRegistrationSuccess(result: Int) {
         progressBar.visibility = View.GONE
-        if (result > 0) {
+        if (result > 0 && flag) {
             var snack = Snackbar.make(btnSignUp, "Registration complete", Snackbar.LENGTH_INDEFINITE).setAction("Ok") {
                 finish()
             }
@@ -54,5 +65,9 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener {
             }
             snack.show()
         }
+    }
+
+    override fun onListenSuccess(result: Boolean) {
+        flag = result
     }
 }

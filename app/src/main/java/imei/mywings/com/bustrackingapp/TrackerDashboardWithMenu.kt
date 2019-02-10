@@ -251,7 +251,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(
             mLocationRequest, locationCallback,
             Looper.myLooper()
-        );
+        )
     }
 
     private val locationCallback = object : LocationCallback() {

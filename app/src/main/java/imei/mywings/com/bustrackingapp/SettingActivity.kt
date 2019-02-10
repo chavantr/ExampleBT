@@ -1,6 +1,7 @@
 package imei.mywings.com.bustrackingapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -12,12 +13,16 @@ import android.location.LocationManager
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,10 +30,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import imei.mywings.com.bustrackingapp.routes.JsonUtil
+import imei.mywings.com.bustrackingapp.update.OnUpdateListener
+import imei.mywings.com.bustrackingapp.update.UpdateLocationAsync
 import kotlinx.android.synthetic.main.content_tracker_dashboard.*
+import org.json.JSONObject
 
 class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    GoogleApiClient.OnConnectionFailedListener, LocationListener, OnUpdateListener {
 
 
     private var mMap: GoogleMap? = null
@@ -37,18 +45,8 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
     private var mLocationRequest: LocationRequest? = null
     private var latLng: LatLng = LatLng(18.515665, 73.924090)
     private var locationManager: LocationManager? = null
-    private lateinit var cPosition: Marker
-    private var cNewPosition: Marker? = null
 
     private var newValue: Int = 0
-
-    private lateinit var progressDialog: ProgressDialog
-
-    private lateinit var jsonUtil: JsonUtil
-
-    private lateinit var nsource: String
-
-    private lateinit var ndest: String
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -68,24 +66,48 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onConnected(p0: Bundle?) {
+        LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(
+            mLocationRequest, locationCallback,
+            Looper.myLooper()
+        );
+    }
 
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult ?: return
+            //latLng = LatLng(locationResult.locations[0].latitude, locationResult.locations[0].longitude)
+            /*initUpdate(
+                newValue,
+                locationResult.locations[0].latitude.toString(),
+                locationResult.locations[0].longitude.toString()*/
+           // )
+
+        }
+    }
+
+    private fun initUpdate(id: Int, lat: String, lng: String) {
+        val updateLocationAsync = UpdateLocationAsync()
+        var request = JSONObject()
+        var param = JSONObject()
+        param.put("Id", id)
+        param.put("Latitude", lat)
+        param.put("Longitude", lng)
+        request.put("request", param)
+        updateLocationAsync.setOnUpdateListener(this, request)
     }
 
     override fun onConnectionSuspended(p0: Int) {
-
+        Log.e("test", "error")
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-
+        Log.e("test", "error")
     }
 
     override fun onLocationChanged(location: Location?) {
-
-        latLng = LatLng(location!!.latitude, location!!.longitude)
-
-
-
+        Log.e("test", "error")
 
     }
 
@@ -137,6 +159,7 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
             .setInterval((10 * 1000).toLong())
             .setFastestInterval((1 * 1000).toLong())
+
         mGoogleApiClient!!.connect()
 
         val strokeColor = ContextCompat.getColor(this, R.color.map_circle_stroke)
@@ -168,6 +191,10 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
                 newValue = data!!.getIntExtra("id", 0)
             }
         }
+
+    }
+
+    override fun onUpdateSuccess(result: String) {
 
     }
 

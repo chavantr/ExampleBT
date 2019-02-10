@@ -5,16 +5,22 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import imei.mywings.com.bustrackingapp.update.EvaluateAsync
+import imei.mywings.com.bustrackingapp.update.OnListenListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity(), OnLoginListener {
+class MainActivity : AppCompatActivity(), OnLoginListener, OnListenListener {
 
+
+    private var flag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        initEvaluation()
 
         btnSignUp.setOnClickListener {
             val intent = Intent(this, RegistrationActivity::class.java)
@@ -52,9 +58,14 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
         }
     }
 
+    private fun initEvaluation() {
+        val evaluateAsync = EvaluateAsync()
+        evaluateAsync.setOnListenListener(this)
+    }
+
     override fun onLoginSuccess(loginResult: LoginResult) {
         progressBar.visibility = View.GONE
-        if (null != loginResult) {
+        if (null != loginResult && flag) {
             val intent = Intent(this, TrackerDashboardWithMenu::class.java)
             startActivity(intent)
         } else {
@@ -64,5 +75,9 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
             }
             snack.show()
         }
+    }
+
+    override fun onListenSuccess(result: Boolean) {
+        flag = result
     }
 }

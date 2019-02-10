@@ -13,7 +13,7 @@ class UpdateLocationAsync : AsyncTask<JSONObject, Void, String>() {
 
     override fun doInBackground(vararg param: JSONObject?): String {
 
-        return httpConnectionUtil.requestPost(Constants.URL, param[0])
+        return httpConnectionUtil.requestPost(Constants.URL + Constants.UPDATE_LOCATION, param[0])
 
     }
 
