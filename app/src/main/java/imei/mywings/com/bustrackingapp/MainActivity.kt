@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import imei.mywings.com.bustrackingapp.routes.UserDataHelper
 import imei.mywings.com.bustrackingapp.update.EvaluateAsync
 import imei.mywings.com.bustrackingapp.update.OnListenListener
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,8 +29,8 @@ class MainActivity : AppCompatActivity(), OnLoginListener, OnListenListener {
         }
 
         btnSignIn.setOnClickListener {
-            txtUserName.setText("test@test.com")
-            txtPassword.setText("test")
+            //txtUserName.setText("test@test.com")
+            //txtPassword.setText("test")
             login()
         }
 
@@ -65,7 +66,8 @@ class MainActivity : AppCompatActivity(), OnLoginListener, OnListenListener {
 
     override fun onLoginSuccess(loginResult: LoginResult) {
         progressBar.visibility = View.GONE
-        if (null != loginResult && flag) {
+        if (null != loginResult && loginResult.id!! > 0 && flag) {
+            UserDataHelper.getInstance().loginResult = loginResult
             val intent = Intent(this, TrackerDashboardWithMenu::class.java)
             startActivity(intent)
         } else {

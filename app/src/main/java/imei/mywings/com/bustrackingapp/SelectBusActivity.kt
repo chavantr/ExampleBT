@@ -15,7 +15,7 @@ class SelectBusActivity : AppCompatActivity(), OnBusListener, OnSelectedBusListe
 
     private lateinit var jointAdapter: JointAdapter
 
-   // private var flag: Boolean = false
+    // private var flag: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +27,7 @@ class SelectBusActivity : AppCompatActivity(), OnBusListener, OnSelectedBusListe
     }
 
     override fun onBusSuccess(result: List<Bus>) {
-        if (result.isNotEmpty() ) {
+        if (result.isNotEmpty()) {
             jointAdapter = JointAdapter(result)
             jointAdapter.setOnSelectedBusListener(this@SelectBusActivity)
             lstSelect.adapter = jointAdapter
@@ -40,16 +40,15 @@ class SelectBusActivity : AppCompatActivity(), OnBusListener, OnSelectedBusListe
     }
 
     override fun onListenSuccess(result: Boolean) {
-       // flag = result
+        // flag = result
     }
 
     override fun onBusSelected(item: Bus) {
-      ////  if (flag) {
-            val mIntent = Intent()
-            mIntent.putExtra("id", item.id)
-            setResult(RESULT_OK, mIntent)
-            finish()
-      //  }
+        val mIntent = Intent()
+        mIntent.putExtra("id", item.id)
+        mIntent.putExtra("vname", item.name)
+        setResult(RESULT_OK, mIntent)
+        finish()
     }
 
     private fun getBuses() {

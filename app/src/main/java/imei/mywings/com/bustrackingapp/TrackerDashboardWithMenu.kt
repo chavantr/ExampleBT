@@ -45,6 +45,7 @@ import kotlinx.android.synthetic.main.activity_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.app_bar_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.content_tracker_dashboard.*
 import kotlinx.android.synthetic.main.layout_info.view.*
+import kotlinx.android.synthetic.main.nav_header_tracker_dashboard_with_menu.view.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -102,6 +103,15 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+
+
+        var view = nav_view.getHeaderView(0)
+
+        view.lblName.text = ""
+        view.textView.text = ""
+
+
+
 
         nav_view.setNavigationItemSelectedListener(this)
     }

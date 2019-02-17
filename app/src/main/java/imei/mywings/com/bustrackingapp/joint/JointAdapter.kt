@@ -27,24 +27,17 @@ class JointAdapter(var list: List<Bus>) : RecyclerView.Adapter<JointAdapter.Join
     override fun getItemCount(): Int = lst.size
 
     override fun onBindViewHolder(viewHolder: JointViewHolder, position: Int) {
-
         viewHolder.lblName.text = lst[position].name
-
         viewHolder.lblName.setOnClickListener {
             onSelectedBusListener.onBusSelected(lst[position])
         }
-
     }
 
-
     inner class JointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
         val lblName = itemView.lblName!!
-
     }
 
     fun setOnSelectedBusListener(onSelectedBusListener: OnSelectedBusListener) {
         this.onSelectedBusListener = onSelectedBusListener
     }
-
 }

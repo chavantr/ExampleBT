@@ -1,6 +1,7 @@
 package imei.mywings.com.bustrackingapp
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -13,6 +14,9 @@ import org.json.JSONObject
 class RegistrationActivity : AppCompatActivity(), OnRegistrationListener, OnListenListener {
 
     private var flag: Boolean = false
+    private var vid: String = ""
+    private var vname: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +34,18 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener, OnList
                 jsonLogin.put("phone", txtPhone.text)
                 jsonLogin.put("password", txtPassword.text)
                 jsonLogin.put("username", "")
+                jsonLogin.put("extra", vid)
+                jsonLogin.put("extra1", vname)
                 jFirst.put("registration", jsonLogin)
                 loginTask.setRegistrationListener(this, jFirst)
             }
         }
+
+        lblSelect.setOnClickListener {
+            val intent = Intent(this@RegistrationActivity, SelectBusActivity::class.java)
+            startActivityForResult(intent, 1001)
+        }
+
     }
 
     private fun initEvaluation() {
@@ -50,6 +62,18 @@ class RegistrationActivity : AppCompatActivity(), OnRegistrationListener, OnList
             txtPassword.text!!.isEmpty() -> false
             else -> true
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1001) {
+                vid = data!!.extras.getInt("id").toString()
+                vname = data!!.extras.getString("vname")
+                lblSelect.text = vname
+            }
+        }
+
     }
 
     override fun onRegistrationSuccess(result: Int) {

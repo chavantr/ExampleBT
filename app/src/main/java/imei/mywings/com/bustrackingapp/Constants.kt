@@ -10,6 +10,8 @@ object Constants {
 
     val UPDATE_LOCATION = "UpdateLocation"
 
+    val UPDATE_PROFILE = "UpdateProfile"
+
     val GET_CURRENT_LOCATION_BY_ID = "GetCurrentLocationById"
 
     val ESTABLISH_CONNECTION = "EstablishConnection"
