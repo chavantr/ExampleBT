@@ -34,6 +34,7 @@ import imei.mywings.com.bustrackingapp.update.OnUpdateListener
 import imei.mywings.com.bustrackingapp.update.UpdateLocationAsync
 import kotlinx.android.synthetic.main.content_tracker_dashboard.*
 import org.json.JSONObject
+import java.util.*
 
 class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener, OnUpdateListener {
@@ -77,13 +78,27 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            //latLng = LatLng(locationResult.locations[0].latitude, locationResult.locations[0].longitude)
+            latLng = LatLng(locationResult.locations[0].latitude, locationResult.locations[0].longitude)
             /*initUpdate(
                 newValue,
                 locationResult.locations[0].latitude.toString(),
                 locationResult.locations[0].longitude.toString()*/
-           // )
+            // )
 
+        }
+    }
+
+    private fun fetch() {
+        Timer().schedule(timerTask, 5000, 20000)
+    }
+
+    private val timerTask = object : TimerTask() {
+        override fun run() {
+            initUpdate(
+                newValue,
+                latLng.latitude.toString(),
+                latLng.longitude.toString()
+            )
         }
     }
 
@@ -189,6 +204,7 @@ class SettingActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1001) {
                 newValue = data!!.getIntExtra("id", 0)
+                fetch()
             }
         }
 
