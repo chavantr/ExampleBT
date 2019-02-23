@@ -226,8 +226,10 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                 .strokeWidth(2f)
         )
         mMap!!.addMarker(MarkerOptions().position(latLng))
-        val cameraPos = CameraPosition.Builder().tilt(60f).target(latLng).zoom(20f).build()
-        mMap!!.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos), 1000, null)
+        // val cameraPos = CameraPosition.Builder().tilt(20f).target(latLng).zoom(120f).build()
+        // mMap!!.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos), 2000, null)
+
+        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8.0f));
 
         mMap!!.setInfoWindowAdapter(infoWindowAdapter)
 
@@ -294,13 +296,14 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
                     MarkerOptions().position(LatLng(node.clat.toDouble(), node.clng.toDouble()))
                         .icon(
                             BitmapDescriptorFactory
-                                .fromResource(R.mipmap.ic_launcher)
+                                .fromResource(R.drawable.ic_new)
                         ).title("Bus : ${node.name} ")
                         .snippet("${node.name} # ${node.drivename} # ${node.driverphone} # ${node.rid} #${node.id}")
                 )
             }
         }
     }
+
 
     private fun getBuses() {
         val getVehicles = GetBus()
@@ -587,7 +590,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         for (item in points) {
             bc.include(item)
         }
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 30))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 90))
     }
 
 
@@ -605,7 +608,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
             cNewPosition = mMap!!.addMarker(
                 MarkerOptions().position(latLnt).title("${find.name}").icon(
                     BitmapDescriptorFactory
-                        .fromResource(R.mipmap.ic_launcher)
+                        .fromResource(R.drawable.ic_new)
                 )
             )
             cNewPosition!!.tag = 1

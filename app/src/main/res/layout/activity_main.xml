@@ -5,6 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/image"
         tools:context=".MainActivity">
 
 
@@ -32,6 +33,7 @@
         <android.support.design.widget.TextInputEditText
                 android:id="@+id/txtUserName"
                 android:layout_width="match_parent"
+                android:textColor="@android:color/white"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_username"/>
 
@@ -55,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_password"
+                android:textColor="@android:color/white"
                 android:inputType="textPassword"/>
 
 
