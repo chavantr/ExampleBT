@@ -43,7 +43,7 @@ import imei.mywings.com.bustrackingapp.update.GetUpdateLocationAsync
 import imei.mywings.com.bustrackingapp.update.OnLocationUpdateListener
 import kotlinx.android.synthetic.main.activity_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.app_bar_tracker_dashboard_with_menu.*
-import kotlinx.android.synthetic.main.content_tracker_dashboard.*
+import kotlinx.android.synthetic.main.content_tracker_dashboard_with_menu.*
 import kotlinx.android.synthetic.main.layout_info.view.*
 import kotlinx.android.synthetic.main.nav_header_tracker_dashboard_with_menu.view.*
 import org.json.JSONArray
@@ -92,6 +92,8 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         progressDialog.setCanceledOnTouchOutside(false)
 
         jsonUtil = JsonUtil()
+
+        //var frame = activity_place_map as SupportMapFragment
 
         var frame = activity_place_map as SupportMapFragment
 
@@ -350,7 +352,7 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
         }
     }
     //internal var key = "&key=AIzaSyA1fYR6-7DIhgORWbFju3nGi3BDojCILp8"
-    internal var key = "&key=AIzaSyClCN7T0VPX7MIoOJEMA3W9JLXhV_S7yx4"
+    private var key = "&key=AIzaSyClCN7T0VPX7MIoOJEMA3W9JLXhV_S7yx4"
 
     private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
         val strOrigin = ("origin=" + origin.latitude + ","
@@ -404,12 +406,69 @@ class TrackerDashboardWithMenu : AppCompatActivity(), NavigationView.OnNavigatio
 
             val dest = LatLng(destlat, destlng)
 
+            esti()
+
             val nav = DownloadTask()
+
             nav.execute(getDirectionsUrl(source, dest))
 
         }
 
     }
+
+    private fun esti() {
+
+
+        var location = Location("Your location")
+
+        location.latitude = srctlat
+
+        location.longitude = srclng
+
+        var location0 = Location("Vehicle location")
+
+        location0.latitude = destlat
+
+        location0.longitude = destlng
+
+        val distance = location.distanceTo(location0)
+
+        // lblEsti.text = "Estimated time : " + (distance / 50)
+
+        var str: String = (distance / 80).toString()
+
+        var strv = str.split(".")
+
+        if (strv.isNotEmpty()) {
+
+            var strF: String = ""
+
+            if (strv[0].length == 3) {
+
+                strF = strv[0][0].toString()
+
+                strF += " Hrs ${strv[0][1]} min"
+
+
+            } else if (strv[0].length == 2) {
+
+            }
+
+
+            lblEsti.text = "Estimated time : " + strF
+        }
+        /*Location location1 = new Location("");
+
+        location1.setLatitude(lat);
+        location1.setLongitude(long);
+
+        Location location2 = new Location("");
+        location2.setLatitude(lat);
+        location2.setLongitude(long);
+
+        float distanceInMeters = location1.distanceTo(location2);*/
+    }
+
 
     private inner class DownloadTask : AsyncTask<String, Void, String>() {
 
